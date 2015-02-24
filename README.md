@@ -18,6 +18,9 @@ like Browserify. This project is in NPM and can be installed with
 
     npm install kefir-cast
 
+The related project [BaconCast](https://github.com/StreakYC/bacon-cast) exists
+to convert streams to Bacon.js streams.
+
 ## Example
 
 Suppose you have a library that exports a single function `doStuff`, which can
