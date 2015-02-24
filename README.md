@@ -1,51 +1,50 @@
-# BaconCast
+# KefirCast
 
-Converts various types of streams to Bacon.js streams. This is intended for use
-by libraries which use Bacon internally, but want to be able to accept streams
-from other libraries or other versions of Bacon as arguments given by the
+Converts various types of streams to Kefir streams. This is intended for use
+by libraries which use Kefir internally, but want to be able to accept streams
+from other libraries or other versions of Kefir as arguments given by the
 application.
 
-* Supports converting RxJS Observables into Bacon streams.
-* Supports converting Kefir streams into Bacon streams.
-* Supports converting a Bacon stream created by one instance of the Bacon
-  library into a stream usable by a different instance of a Bacon library.
-  (Bacon does not support using streams from different Bacon libraries
-  together directly!)
-* Casts non-streams into a Bacon stream of one item by using Bacon.once().
+* Supports converting RxJS Observables into Kefir streams.
+* Supports converting Bacon.js streams into Kefir streams.
+* Supports converting a Kefir stream created by one instance of the Kefir
+  library into a stream usable by a different instance of a Kefir library.
+  (This smooths over possible issues if the application uses a different
+  version of Kefir.)
+* Casts non-streams into a Kefir stream of one item by using Kefir.constant().
 
-BaconCast is intended for use in nodejs and in browsers via CommonJS bundlers
+KefirCast is intended for use in nodejs and in browsers via CommonJS bundlers
 like Browserify. This project is in NPM and can be installed with
 
-    npm install bacon-cast
+    npm install kefir-cast
 
 ## Example
 
 Suppose you have a library that exports a single function `doStuff`, which can
-take a stream as an argument. By using BaconCast, you can support any RxJS
+take a stream as an argument. By using KefirCast, you can support any RxJS
 streams, Kefir streams, Bacon.js streams, or constants that your users might
 pass to you.
 
 ```
-var Bacon = require('baconjs');
-var baconCast = require('bacon-cast');
+var Kefir = require('kefir');
+var kefirCast = require('kefir-cast');
 
 module.exports = function doStuff(input) {
-  var inputStream = baconCast(Bacon, input);
+  var inputStream = kefirCast(Kefir, input);
   // Log anything that comes through the stream for 5 seconds.
-  inputStream.takeUntil(Bacon.later(5000)).onValue(function(value) {
+  inputStream.takeUntilBy(Kefir.later(5000)).onValue(function(value) {
     console.log('doStuff received value', value);
   });
 }
 ```
 
-If you did not use BaconCast, then your users would be required to use the same
-version and instance of Bacon as you, you wouldn't support RxJS or Kefir
-streams without more work, and you would have to handle non-stream constant
-values specially.
+If you did not use KefirCast, then your users would be required to use the same
+version of Kefir as you, you wouldn't support RxJS or Bacon streams without
+more work, and you would have to handle non-stream constant values specially.
 
 ## API
 
-`baconCast(Bacon, input)` takes your Bacon library instance as the first
-argument, and the input stream or constant to convert into a Bacon stream as
-the second argument. A Bacon EventStream compatible with the given Bacon library
+`kefirCast(Kefir, input)` takes your Kefir library instance as the first
+argument, and the input stream or constant to convert into a Kefir stream as
+the second argument. A Kefir stream compatible with the given Kefir library
 will be returned.

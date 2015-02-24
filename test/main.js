@@ -1,13 +1,14 @@
 var constant = require('lodash/utility/constant');
+var noop = require('lodash/utility/noop');
 var assert = require('assert');
 var Bacon = require('baconjs');
 var Rx = require('rx');
 var Kefir = require('kefir');
 
-var baconCast = require('..');
+var kefirCast = require('..');
 
 function testStreamForOneValue(stream, value, callback) {
-  var s = baconCast(Bacon, stream);
+  var s = kefirCast(Kefir, stream);
   var values = 0;
   s.onValue(function(x) {
     assert.strictEqual(x, value);
@@ -23,7 +24,7 @@ function shouldNotBeCalled() {
   throw new Error("Should not be called");
 }
 
-describe('baconCast', function() {
+describe('kefirCast', function() {
   describe('Bacon', function() {
     it('supports basic stream', function(done) {
       testStreamForOneValue(Bacon.later(0, shouldNotBeCalled), shouldNotBeCalled, done);
@@ -31,7 +32,7 @@ describe('baconCast', function() {
 
     it('handles unsubscription', function(done) {
       var calls = 0;
-      var s = baconCast(Bacon, Bacon.fromPoll(0, function() {
+      var s = kefirCast(Kefir, Bacon.fromPoll(0, function() {
         if (++calls === 1) {
           return 'beep';
         } else {
@@ -42,33 +43,38 @@ describe('baconCast', function() {
     });
 
     it('supports all event types', function(done) {
-      var s = baconCast(Bacon, Bacon.mergeAll(
-        Bacon.once('beep'),
-        Bacon.once(new Bacon.Error('bad')),
-        Bacon.once(shouldNotBeCalled)
+      var s = kefirCast(Kefir, Bacon.mergeAll(
+        Bacon.later(0, 'beep'),
+        Bacon.later(1, new Bacon.Error('bad')),
+        Bacon.later(2, shouldNotBeCalled)
       ).toProperty('prop'));
 
       var calls = 0;
-      s.subscribe(function(event) {
+      s.onAny(function(event) {
         switch(++calls) {
           case 1:
-            assert(event instanceof Bacon.Initial);
-            assert.strictEqual(event.value(), 'prop');
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, true);
+            assert.strictEqual(event.value, 'prop');
             break;
           case 2:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), 'beep');
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, 'beep');
             break;
           case 3:
-            assert(event instanceof Bacon.Error);
-            assert.strictEqual(event.error, 'bad');
+            assert.strictEqual(event.type, 'error');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, 'bad');
             break;
           case 4:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), shouldNotBeCalled);
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, shouldNotBeCalled);
             break;
           case 5:
-            assert(event instanceof Bacon.End);
+            assert.strictEqual(event.type, 'end');
+            assert.strictEqual(event.current, false);
             done();
             break;
           default:
@@ -79,72 +85,81 @@ describe('baconCast', function() {
 
     it('works on mock stream object', function(done) {
       var unsubbed = 0;
-      var s = baconCast(Bacon, {
+      var s = kefirCast(Kefir, {
         onValue: true,
         subscribe: function(sink) {
           sink({
             isInitial: constant(true), isNext: constant(false),
             isError: constant(false), isEnd: constant(false),
-            value: constant('prop')
-          });
-          sink({
-            isInitial: constant(false), isNext: constant(true),
-            isError: constant(false), isEnd: constant(false),
-            value: constant('beep')
+            value: constant('prop'), hasValue: constant(true)
           });
           setTimeout(function() {
             sink({
+              isInitial: constant(false), isNext: constant(true),
+              isError: constant(false), isEnd: constant(false),
+              value: constant('beep'), hasValue: constant(true)
+            });
+            sink({
               isInitial: constant(false), isNext: constant(false),
               isError: constant(true), isEnd: constant(false),
-              error: 'bad'
+              error: 'bad', hasValue: constant(false)
             });
             sink({
               isInitial: constant(false), isNext: constant(true),
               isError: constant(false), isEnd: constant(false),
-              value: constant(shouldNotBeCalled)
+              value: constant(shouldNotBeCalled), hasValue: constant(true)
             });
             sink({
               isInitial: constant(false), isNext: constant(false),
-              isError: constant(false), isEnd: constant(true)
+              isError: constant(false), isEnd: constant(true),
+              hasValue: constant(false)
             });
             sink({
               isInitial: constant(false), isNext: constant(true),
               isError: constant(false), isEnd: constant(false),
               value: function() {
                 throw new Error("Post-end event should not be evaluated");
-              }
+              }, hasValue: constant(true)
             });
           }, 0);
 
           return function() {
             unsubbed++;
+            sink = noop;
           };
         }
       });
 
       var calls = 0;
-      s.subscribe(function(event) {
+      s.onAny(function(event) {
         switch(++calls) {
           case 1:
-            assert(event instanceof Bacon.Initial);
-            assert.strictEqual(event.value(), 'prop');
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, true);
+            assert.strictEqual(event.value, 'prop');
             break;
           case 2:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), 'beep');
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, 'beep');
             break;
           case 3:
-            assert(event instanceof Bacon.Error);
-            assert.strictEqual(event.error, 'bad');
+            assert.strictEqual(event.type, 'error');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, 'bad');
             break;
           case 4:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), shouldNotBeCalled);
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, shouldNotBeCalled);
             break;
           case 5:
-            assert(event instanceof Bacon.End);
-            assert.strictEqual(unsubbed, 1);
-            done();
+            assert.strictEqual(event.type, 'end');
+            assert.strictEqual(event.current, false);
+            setTimeout(function() {
+              assert.strictEqual(unsubbed, 1);
+              done();
+            }, 1);
             break;
           default:
             throw new Error("Should not happen");
@@ -155,30 +170,32 @@ describe('baconCast', function() {
     it('can listen on stream multiple times', function(done) {
       var bus = new Bacon.Bus();
 
-      var s = baconCast(Bacon, bus);
+      var s = kefirCast(Kefir, bus);
 
       var calls1 = 0, calls2 = 0;
-      s.take(1).subscribe(function(event) {
+      s.take(1).onAny(function(event) {
         switch (++calls1) {
           case 1:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), 1);
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, 1);
             break;
           case 2:
-            assert(event instanceof Bacon.End);
+            assert.strictEqual(event.type, 'end');
 
-            s.subscribe(function(event) {
+            s.onAny(function(event) {
               switch (++calls2) {
                 case 1:
-                  assert(event instanceof Bacon.Next);
-                  assert.strictEqual(event.value(), 2);
+                  assert.strictEqual(event.type, 'value');
+                  assert.strictEqual(event.current, false);
+                  assert.strictEqual(event.value, 2);
                   break;
                 case 2:
-                  assert(event instanceof Bacon.End);
+                  assert.strictEqual(event.type, 'end');
 
                   setTimeout(function() {
-                    s.subscribe(function(event) {
-                      assert(event instanceof Bacon.End);
+                    s.onAny(function(event) {
+                      assert.strictEqual(event.type, 'end');
                       done();
                     });
                   }, 0);
@@ -201,24 +218,24 @@ describe('baconCast', function() {
 
   describe('RxJS', function() {
     it('supports basic observable', function(done) {
-      var s = baconCast(Bacon, Rx.Observable.fromArray([
+      var s = kefirCast(Kefir, Rx.Observable.fromArray([
         'beep',
         shouldNotBeCalled
       ]));
 
       var calls = 0;
-      s.subscribe(function(event) {
+      s.onAny(function(event) {
         switch(++calls) {
           case 1:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), 'beep');
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.value, 'beep');
             break;
           case 2:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), shouldNotBeCalled);
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.value, shouldNotBeCalled);
             break;
           case 3:
-            assert(event instanceof Bacon.End);
+            assert.strictEqual(event.type, 'end');
             done();
             break;
           default:
@@ -227,67 +244,45 @@ describe('baconCast', function() {
       });
     });
 
+    it('handles unsubscription', function(done) {
+      var calls = 0;
+      var s = kefirCast(Kefir, Rx.Observable.interval(0).map(function() {
+        if (++calls === 1) {
+          return 'beep';
+        } else {
+          process.nextTick(function() {
+            throw new Error("Unsubscription failed");
+          });
+        }
+      }));
+      s.take(1).onEnd(done);
+    });
+
     it('supports observable with error', function(done) {
       var err = new Error('some err');
-      var s = baconCast(Bacon, Rx.Observable.fromArray([
+      var s = kefirCast(Kefir, Rx.Observable.fromArray([
         'beep',
         shouldNotBeCalled
       ]).concat(Rx.Observable.throw(err)));
 
       var calls = 0;
-      s.subscribe(function(event) {
+      s.onAny(function(event) {
         switch(++calls) {
           case 1:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), 'beep');
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.value, 'beep');
             break;
           case 2:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), shouldNotBeCalled);
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.value, shouldNotBeCalled);
             break;
           case 3:
-            assert(event instanceof Bacon.Error);
-            assert.strictEqual(event.error, err);
+            assert.strictEqual(event.type, 'error');
+            assert.strictEqual(event.value, err);
             break;
           case 4:
-            assert(event instanceof Bacon.End);
+            assert.strictEqual(event.type, 'end');
             done();
-            break;
-          default:
-            throw new Error("Should not happen");
-        }
-      });
-    });
-
-    it('supports infinite synchronous observable unsubscription', function(done) {
-      var i = 0;
-      var s = baconCast(Bacon, Rx.Observable.repeat(null).map(function() {
-        if (++i >= 3) {
-          var err = new Error("Should not happen");
-          // The error would be caught by Rx, so also throw it where it will fail the test.
-          setTimeout(function() {
-            throw err;
-          }, 0);
-          throw err;
-        }
-        return i;
-      })).take(2);
-
-      var calls = 0;
-      s.subscribe(function(event) {
-        switch(++calls) {
-          case 1:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), 1);
-            break;
-          case 2:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), 2);
-            break;
-          case 3:
-            assert(event instanceof Bacon.End);
-            // If the stream doesn't stop, done won't get called.
-            setTimeout(done, 0);
             break;
           default:
             throw new Error("Should not happen");
@@ -298,30 +293,32 @@ describe('baconCast', function() {
     it('can listen on stream multiple times', function(done) {
       var subject = new Rx.Subject();
 
-      var s = baconCast(Bacon, subject);
+      var s = kefirCast(Kefir, subject);
 
       var calls1 = 0, calls2 = 0;
-      s.take(1).subscribe(function(event) {
+      s.take(1).onAny(function(event) {
         switch (++calls1) {
           case 1:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), 1);
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, 1);
             break;
           case 2:
-            assert(event instanceof Bacon.End);
+            assert.strictEqual(event.type, 'end');
 
-            s.subscribe(function(event) {
+            s.onAny(function(event) {
               switch (++calls2) {
                 case 1:
-                  assert(event instanceof Bacon.Next);
-                  assert.strictEqual(event.value(), 2);
+                  assert.strictEqual(event.type, 'value');
+                  assert.strictEqual(event.current, false);
+                  assert.strictEqual(event.value, 2);
                   break;
                 case 2:
-                  assert(event instanceof Bacon.End);
+                  assert.strictEqual(event.type, 'end');
 
                   setTimeout(function() {
-                    s.subscribe(function(event) {
-                      assert(event instanceof Bacon.End);
+                    s.onAny(function(event) {
+                      assert.strictEqual(event.type, 'end');
                       done();
                     });
                   }, 0);
@@ -349,7 +346,7 @@ describe('baconCast', function() {
 
     it('handles unsubscription', function(done) {
       var calls = 0;
-      var s = baconCast(Bacon, Kefir.fromPoll(0, function() {
+      var s = kefirCast(Kefir, Kefir.fromPoll(0, function() {
         if (++calls === 1) {
           return 'beep';
         } else {
@@ -360,33 +357,38 @@ describe('baconCast', function() {
     });
 
     it('supports all event types', function(done) {
-      var s = baconCast(Bacon, Kefir.merge([
+      var s = kefirCast(Kefir, Kefir.merge([
         Kefir.later(0, 'beep'),
         Kefir.later(1, 'bad').valuesToErrors(),
         Kefir.later(2, shouldNotBeCalled)
       ]).toProperty('prop'));
 
       var calls = 0;
-      s.subscribe(function(event) {
+      s.onAny(function(event) {
         switch(++calls) {
           case 1:
-            assert(event instanceof Bacon.Initial);
-            assert.strictEqual(event.value(), 'prop');
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, true);
+            assert.strictEqual(event.value, 'prop');
             break;
           case 2:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), 'beep');
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, 'beep');
             break;
           case 3:
-            assert(event instanceof Bacon.Error);
-            assert.strictEqual(event.error, 'bad');
+            assert.strictEqual(event.type, 'error');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, 'bad');
             break;
           case 4:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), shouldNotBeCalled);
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, shouldNotBeCalled);
             break;
           case 5:
-            assert(event instanceof Bacon.End);
+            assert.strictEqual(event.type, 'end');
+            assert.strictEqual(event.current, false);
             done();
             break;
           default:
@@ -398,30 +400,32 @@ describe('baconCast', function() {
     it('can listen on stream multiple times', function(done) {
       var bus = new Kefir.Bus();
 
-      var s = baconCast(Bacon, bus);
+      var s = kefirCast(Kefir, bus);
 
       var calls1 = 0, calls2 = 0;
-      s.take(1).subscribe(function(event) {
+      s.take(1).onAny(function(event) {
         switch (++calls1) {
           case 1:
-            assert(event instanceof Bacon.Next);
-            assert.strictEqual(event.value(), 1);
+            assert.strictEqual(event.type, 'value');
+            assert.strictEqual(event.current, false);
+            assert.strictEqual(event.value, 1);
             break;
           case 2:
-            assert(event instanceof Bacon.End);
+            assert.strictEqual(event.type, 'end');
 
-            s.subscribe(function(event) {
+            s.onAny(function(event) {
               switch (++calls2) {
                 case 1:
-                  assert(event instanceof Bacon.Next);
-                  assert.strictEqual(event.value(), 2);
+                  assert.strictEqual(event.type, 'value');
+                  assert.strictEqual(event.current, false);
+                  assert.strictEqual(event.value, 2);
                   break;
                 case 2:
-                  assert(event instanceof Bacon.End);
+                  assert.strictEqual(event.type, 'end');
 
                   setTimeout(function() {
-                    s.subscribe(function(event) {
-                      assert(event instanceof Bacon.End);
+                    s.onAny(function(event) {
+                      assert.strictEqual(event.type, 'end');
                       done();
                     });
                   }, 0);
