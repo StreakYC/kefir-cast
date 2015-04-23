@@ -1,6 +1,6 @@
 function kefirCast(Kefir, input) {
   if (input && input.subscribe && input.subscribeOnNext) { // RxJS
-    return Kefir.fromBinder(function(emitter) {
+    return Kefir.stream(function(emitter) {
       var subscription = input.subscribe(function onNext(value) {
         emitter.emit(value);
       }, function onError(err) {
@@ -12,7 +12,7 @@ function kefirCast(Kefir, input) {
       return subscription.dispose.bind(subscription);
     });
   } else if (input && input.onAny && input.offAny) { // Kefir
-    return Kefir.fromBinder(function(emitter) {
+    return Kefir.stream(function(emitter) {
       function listener(event) {
         switch (event.type) {
           case 'value':
@@ -32,7 +32,7 @@ function kefirCast(Kefir, input) {
       return input.offAny.bind(input, listener);
     });
   } else if (input && input.subscribe && input.onValue) { // Bacon
-    return Kefir.fromBinder(function(emitter) {
+    return Kefir.stream(function(emitter) {
       return input.subscribe(function(event) {
         if (event.hasValue()) {
           emitter.emit(event.value());

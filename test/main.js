@@ -361,7 +361,7 @@ describe('kefirCast', function() {
         Kefir.later(0, 'beep'),
         Kefir.later(1, 'bad').valuesToErrors(),
         Kefir.later(2, shouldNotBeCalled)
-      ]).toProperty('prop'));
+      ]).toProperty(constant('prop')));
 
       var calls = 0;
       s.onAny(function(event) {

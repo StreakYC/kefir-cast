@@ -1,6 +1,6 @@
 {
   "name": "kefir-cast",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Convert various types of streams to Kefir streams.",
   "main": "index.js",
   "scripts": {
@@ -32,12 +32,12 @@
   "homepage": "https://github.com/StreakYC/kefir-cast",
   "devDependencies": {
     "baconjs": "^0.7.41",
-    "kefir": "^1.1.0",
+    "kefir": "^2.0.0",
     "lodash": "^3.3.1",
     "mocha": "^2.1.0",
     "rx": "^2.4.1"
   },
   "peerDependencies": {
-    "kefir": "^1.1.0"
+    "kefir": "^2.0.0"
   }
 }
