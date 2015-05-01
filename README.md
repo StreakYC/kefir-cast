@@ -38,7 +38,7 @@ module.exports = function doStuff(input) {
   inputStream.takeUntilBy(Kefir.later(5000)).onValue(function(value) {
     console.log('doStuff received value', value);
   });
-}
+};
 ```
 
 If you did not use KefirCast, then your users would be required to use the same
