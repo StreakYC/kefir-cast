@@ -28,7 +28,7 @@ take a stream as an argument. By using KefirCast, you can support any RxJS
 streams, Kefir streams, Bacon.js streams, or constants that your users might
 pass to you.
 
-```
+```javascript
 var Kefir = require('kefir');
 var kefirCast = require('kefir-cast');
 
