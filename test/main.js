@@ -4,6 +4,7 @@ var assert = require('assert');
 var Bacon = require('baconjs');
 var Rx = require('rx');
 var Kefir = require('kefir');
+var kefirBus = require('kefir-bus');
 
 var kefirCast = require('..');
 
@@ -54,27 +55,22 @@ describe('kefirCast', function() {
         switch(++calls) {
           case 1:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, true);
             assert.strictEqual(event.value, 'prop');
             break;
           case 2:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, 'beep');
             break;
           case 3:
             assert.strictEqual(event.type, 'error');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, 'bad');
             break;
           case 4:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, shouldNotBeCalled);
             break;
           case 5:
             assert.strictEqual(event.type, 'end');
-            assert.strictEqual(event.current, false);
             done();
             break;
           default:
@@ -135,27 +131,22 @@ describe('kefirCast', function() {
         switch(++calls) {
           case 1:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, true);
             assert.strictEqual(event.value, 'prop');
             break;
           case 2:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, 'beep');
             break;
           case 3:
             assert.strictEqual(event.type, 'error');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, 'bad');
             break;
           case 4:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, shouldNotBeCalled);
             break;
           case 5:
             assert.strictEqual(event.type, 'end');
-            assert.strictEqual(event.current, false);
             setTimeout(function() {
               assert.strictEqual(unsubbed, 1);
               done();
@@ -177,7 +168,6 @@ describe('kefirCast', function() {
         switch (++calls1) {
           case 1:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, 1);
             break;
           case 2:
@@ -187,7 +177,6 @@ describe('kefirCast', function() {
               switch (++calls2) {
                 case 1:
                   assert.strictEqual(event.type, 'value');
-                  assert.strictEqual(event.current, false);
                   assert.strictEqual(event.value, 2);
                   break;
                 case 2:
@@ -300,7 +289,6 @@ describe('kefirCast', function() {
         switch (++calls1) {
           case 1:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, 1);
             break;
           case 2:
@@ -310,7 +298,6 @@ describe('kefirCast', function() {
               switch (++calls2) {
                 case 1:
                   assert.strictEqual(event.type, 'value');
-                  assert.strictEqual(event.current, false);
                   assert.strictEqual(event.value, 2);
                   break;
                 case 2:
@@ -359,7 +346,7 @@ describe('kefirCast', function() {
     it('supports all event types', function(done) {
       var s = kefirCast(Kefir, Kefir.merge([
         Kefir.later(0, 'beep'),
-        Kefir.later(1, 'bad').valuesToErrors(),
+        Kefir.later(1, 'bad').flatMap(Kefir.constantError),
         Kefir.later(2, shouldNotBeCalled)
       ]).toProperty(constant('prop')));
 
@@ -368,27 +355,22 @@ describe('kefirCast', function() {
         switch(++calls) {
           case 1:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, true);
             assert.strictEqual(event.value, 'prop');
             break;
           case 2:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, 'beep');
             break;
           case 3:
             assert.strictEqual(event.type, 'error');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, 'bad');
             break;
           case 4:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, shouldNotBeCalled);
             break;
           case 5:
             assert.strictEqual(event.type, 'end');
-            assert.strictEqual(event.current, false);
             done();
             break;
           default:
@@ -398,7 +380,7 @@ describe('kefirCast', function() {
     });
 
     it('can listen on stream multiple times', function(done) {
-      var bus = new Kefir.Bus();
+      var bus = kefirBus();
 
       var s = kefirCast(Kefir, bus);
 
@@ -407,7 +389,6 @@ describe('kefirCast', function() {
         switch (++calls1) {
           case 1:
             assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.current, false);
             assert.strictEqual(event.value, 1);
             break;
           case 2:
@@ -417,7 +398,6 @@ describe('kefirCast', function() {
               switch (++calls2) {
                 case 1:
                   assert.strictEqual(event.type, 'value');
-                  assert.strictEqual(event.current, false);
                   assert.strictEqual(event.value, 2);
                   break;
                 case 2:
