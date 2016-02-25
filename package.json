@@ -36,7 +36,7 @@
     "kefir-bus": "^2.0.0",
     "lodash": "^3.3.1",
     "mocha": "^2.1.0",
-    "rx": "^2.4.1"
+    "rx": "^4.0.8"
   },
   "peerDependencies": {
     "kefir": "^3.0.0"
