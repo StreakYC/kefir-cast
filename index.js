@@ -11,7 +11,7 @@ function kefirCast(Kefir, input) {
       }, function onCompleted() {
         emitter.end();
       });
-      return subscription.dispose.bind(subscription);
+      return function() { subscription.dispose(); };
     });
   } else if (input && input.onAny && input.offAny) { // Kefir
     return Kefir.stream(function(emitter) {
@@ -31,7 +31,7 @@ function kefirCast(Kefir, input) {
         }
       }
       input.onAny(listener);
-      return input.offAny.bind(input, listener);
+      return function() { input.offAny(listener); };
     });
   } else if (input && input.subscribe && input.onValue) { // Bacon
     return Kefir.stream(function(emitter) {
