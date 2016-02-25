@@ -1,5 +1,8 @@
 # KefirCast
 
+[![Circle CI](https://circleci.com/gh/StreakYC/kefir-cast.svg?style=shield)](https://circleci.com/gh/StreakYC/kefir-cast)
+[![npm version](https://badge.fury.io/js/kefir-cast.svg)](https://badge.fury.io/js/kefir-cast)
+
 Converts various types of streams to Kefir streams. This is intended for use
 by libraries which use Kefir internally, but want to be able to accept streams
 from other libraries or other versions of Kefir as arguments given by the
