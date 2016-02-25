@@ -1,3 +1,5 @@
+'use strict';
+
 var constant = require('lodash/utility/constant');
 var noop = require('lodash/utility/noop');
 var assert = require('assert');

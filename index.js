@@ -1,3 +1,5 @@
+'use strict';
+
 function kefirCast(Kefir, input) {
   if (input && input.subscribe && input.subscribeOnNext) { // RxJS
     return Kefir.stream(function(emitter) {
