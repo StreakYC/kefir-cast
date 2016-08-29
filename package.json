@@ -4,7 +4,10 @@
   "description": "Convert various types of streams to Kefir streams.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "npm run lint && npm run flow_check && mocha",
+    "flow_check": "flow check",
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
@@ -31,7 +34,10 @@
   },
   "homepage": "https://github.com/StreakYC/kefir-cast",
   "devDependencies": {
+    "babel-eslint": "^6.1.2",
     "baconjs": "^0.7.41",
+    "eslint": "^3.4.0",
+    "flow-bin": "^0.31.1",
     "kefir": "^3.0.0",
     "kefir-bus": "^2.0.0",
     "lodash": "^4.15.0",

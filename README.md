@@ -54,3 +54,8 @@ more work, and you would have to handle non-stream constant values specially.
 argument, and the input stream or constant to convert into a Kefir stream as
 the second argument. A Kefir stream compatible with the given Kefir library
 will be returned.
+
+## Types
+
+[Flow](https://flowtype.org/) type declarations for this module are included!
+If you are using Flow, they won't require any configuration to use.

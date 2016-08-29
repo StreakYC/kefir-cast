@@ -24,7 +24,7 @@ function testStreamForOneValue(stream, value, callback) {
 }
 
 function shouldNotBeCalled() {
-  throw new Error("Should not be called");
+  throw new Error('Should not be called');
 }
 
 describe('kefirCast', function() {
@@ -39,7 +39,7 @@ describe('kefirCast', function() {
         if (++calls === 1) {
           return 'beep';
         } else {
-          throw new Error("Should not happen");
+          throw new Error('Should not happen');
         }
       }));
       s.take(1).onEnd(done);
@@ -54,29 +54,29 @@ describe('kefirCast', function() {
 
       var calls = 0;
       s.onAny(function(event) {
-        switch(++calls) {
-          case 1:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, 'prop');
-            break;
-          case 2:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, 'beep');
-            break;
-          case 3:
-            assert.strictEqual(event.type, 'error');
-            assert.strictEqual(event.value, 'bad');
-            break;
-          case 4:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, shouldNotBeCalled);
-            break;
-          case 5:
-            assert.strictEqual(event.type, 'end');
-            done();
-            break;
-          default:
-            throw new Error("Should not happen");
+        switch (++calls) {
+        case 1:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, 'prop');
+          break;
+        case 2:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, 'beep');
+          break;
+        case 3:
+          assert.strictEqual(event.type, 'error');
+          assert.strictEqual(event.value, 'bad');
+          break;
+        case 4:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, shouldNotBeCalled);
+          break;
+        case 5:
+          assert.strictEqual(event.type, 'end');
+          done();
+          break;
+        default:
+          throw new Error('Should not happen');
         }
       });
     });
@@ -116,7 +116,7 @@ describe('kefirCast', function() {
               isInitial: constant(false), isNext: constant(true),
               isError: constant(false), isEnd: constant(false),
               value: function() {
-                throw new Error("Post-end event should not be evaluated");
+                throw new Error('Post-end event should not be evaluated');
               }, hasValue: constant(true)
             });
           }, 0);
@@ -130,32 +130,32 @@ describe('kefirCast', function() {
 
       var calls = 0;
       s.onAny(function(event) {
-        switch(++calls) {
-          case 1:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, 'prop');
-            break;
-          case 2:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, 'beep');
-            break;
-          case 3:
-            assert.strictEqual(event.type, 'error');
-            assert.strictEqual(event.value, 'bad');
-            break;
-          case 4:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, shouldNotBeCalled);
-            break;
-          case 5:
-            assert.strictEqual(event.type, 'end');
-            setTimeout(function() {
-              assert.strictEqual(unsubbed, 1);
-              done();
-            }, 1);
-            break;
-          default:
-            throw new Error("Should not happen");
+        switch (++calls) {
+        case 1:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, 'prop');
+          break;
+        case 2:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, 'beep');
+          break;
+        case 3:
+          assert.strictEqual(event.type, 'error');
+          assert.strictEqual(event.value, 'bad');
+          break;
+        case 4:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, shouldNotBeCalled);
+          break;
+        case 5:
+          assert.strictEqual(event.type, 'end');
+          setTimeout(function() {
+            assert.strictEqual(unsubbed, 1);
+            done();
+          }, 1);
+          break;
+        default:
+          throw new Error('Should not happen');
         }
       });
     });
@@ -168,37 +168,37 @@ describe('kefirCast', function() {
       var calls1 = 0, calls2 = 0;
       s.take(1).onAny(function(event) {
         switch (++calls1) {
-          case 1:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, 1);
-            break;
-          case 2:
-            assert.strictEqual(event.type, 'end');
+        case 1:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, 1);
+          break;
+        case 2:
+          assert.strictEqual(event.type, 'end');
 
-            s.onAny(function(event) {
-              switch (++calls2) {
-                case 1:
-                  assert.strictEqual(event.type, 'value');
-                  assert.strictEqual(event.value, 2);
-                  break;
-                case 2:
+          s.onAny(function(event) {
+            switch (++calls2) {
+            case 1:
+              assert.strictEqual(event.type, 'value');
+              assert.strictEqual(event.value, 2);
+              break;
+            case 2:
+              assert.strictEqual(event.type, 'end');
+
+              setTimeout(function() {
+                s.onAny(function(event) {
                   assert.strictEqual(event.type, 'end');
+                  done();
+                });
+              }, 0);
 
-                  setTimeout(function() {
-                    s.onAny(function(event) {
-                      assert.strictEqual(event.type, 'end');
-                      done();
-                    });
-                  }, 0);
-
-                  break;
-                default:
-                  throw new Error("Should not happen");
-              }
-            });
-            break;
-          default:
-            throw new Error("Should not happen");
+              break;
+            default:
+              throw new Error('Should not happen');
+            }
+          });
+          break;
+        default:
+          throw new Error('Should not happen');
         }
       });
       bus.push(1);
@@ -216,21 +216,21 @@ describe('kefirCast', function() {
 
       var calls = 0;
       s.onAny(function(event) {
-        switch(++calls) {
-          case 1:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, 'beep');
-            break;
-          case 2:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, shouldNotBeCalled);
-            break;
-          case 3:
-            assert.strictEqual(event.type, 'end');
-            done();
-            break;
-          default:
-            throw new Error("Should not happen");
+        switch (++calls) {
+        case 1:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, 'beep');
+          break;
+        case 2:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, shouldNotBeCalled);
+          break;
+        case 3:
+          assert.strictEqual(event.type, 'end');
+          done();
+          break;
+        default:
+          throw new Error('Should not happen');
         }
       });
     });
@@ -242,7 +242,7 @@ describe('kefirCast', function() {
           return 'beep';
         } else {
           process.nextTick(function() {
-            throw new Error("Unsubscription failed");
+            throw new Error('Unsubscription failed');
           });
         }
       }));
@@ -258,25 +258,25 @@ describe('kefirCast', function() {
 
       var calls = 0;
       s.onAny(function(event) {
-        switch(++calls) {
-          case 1:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, 'beep');
-            break;
-          case 2:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, shouldNotBeCalled);
-            break;
-          case 3:
-            assert.strictEqual(event.type, 'error');
-            assert.strictEqual(event.value, err);
-            break;
-          case 4:
-            assert.strictEqual(event.type, 'end');
-            done();
-            break;
-          default:
-            throw new Error("Should not happen");
+        switch (++calls) {
+        case 1:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, 'beep');
+          break;
+        case 2:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, shouldNotBeCalled);
+          break;
+        case 3:
+          assert.strictEqual(event.type, 'error');
+          assert.strictEqual(event.value, err);
+          break;
+        case 4:
+          assert.strictEqual(event.type, 'end');
+          done();
+          break;
+        default:
+          throw new Error('Should not happen');
         }
       });
     });
@@ -289,37 +289,37 @@ describe('kefirCast', function() {
       var calls1 = 0, calls2 = 0;
       s.take(1).onAny(function(event) {
         switch (++calls1) {
-          case 1:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, 1);
-            break;
-          case 2:
-            assert.strictEqual(event.type, 'end');
+        case 1:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, 1);
+          break;
+        case 2:
+          assert.strictEqual(event.type, 'end');
 
-            s.onAny(function(event) {
-              switch (++calls2) {
-                case 1:
-                  assert.strictEqual(event.type, 'value');
-                  assert.strictEqual(event.value, 2);
-                  break;
-                case 2:
+          s.onAny(function(event) {
+            switch (++calls2) {
+            case 1:
+              assert.strictEqual(event.type, 'value');
+              assert.strictEqual(event.value, 2);
+              break;
+            case 2:
+              assert.strictEqual(event.type, 'end');
+
+              setTimeout(function() {
+                s.onAny(function(event) {
                   assert.strictEqual(event.type, 'end');
+                  done();
+                });
+              }, 0);
 
-                  setTimeout(function() {
-                    s.onAny(function(event) {
-                      assert.strictEqual(event.type, 'end');
-                      done();
-                    });
-                  }, 0);
-
-                  break;
-                default:
-                  throw new Error("Should not happen");
-              }
-            });
-            break;
-          default:
-            throw new Error("Should not happen");
+              break;
+            default:
+              throw new Error('Should not happen');
+            }
+          });
+          break;
+        default:
+          throw new Error('Should not happen');
         }
       });
       subject.onNext(1);
@@ -339,7 +339,7 @@ describe('kefirCast', function() {
         if (++calls === 1) {
           return 'beep';
         } else {
-          throw new Error("Should not happen");
+          throw new Error('Should not happen');
         }
       }));
       s.take(1).onEnd(done);
@@ -354,29 +354,29 @@ describe('kefirCast', function() {
 
       var calls = 0;
       s.onAny(function(event) {
-        switch(++calls) {
-          case 1:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, 'prop');
-            break;
-          case 2:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, 'beep');
-            break;
-          case 3:
-            assert.strictEqual(event.type, 'error');
-            assert.strictEqual(event.value, 'bad');
-            break;
-          case 4:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, shouldNotBeCalled);
-            break;
-          case 5:
-            assert.strictEqual(event.type, 'end');
-            done();
-            break;
-          default:
-            throw new Error("Should not happen");
+        switch (++calls) {
+        case 1:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, 'prop');
+          break;
+        case 2:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, 'beep');
+          break;
+        case 3:
+          assert.strictEqual(event.type, 'error');
+          assert.strictEqual(event.value, 'bad');
+          break;
+        case 4:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, shouldNotBeCalled);
+          break;
+        case 5:
+          assert.strictEqual(event.type, 'end');
+          done();
+          break;
+        default:
+          throw new Error('Should not happen');
         }
       });
     });
@@ -389,37 +389,37 @@ describe('kefirCast', function() {
       var calls1 = 0, calls2 = 0;
       s.take(1).onAny(function(event) {
         switch (++calls1) {
-          case 1:
-            assert.strictEqual(event.type, 'value');
-            assert.strictEqual(event.value, 1);
-            break;
-          case 2:
-            assert.strictEqual(event.type, 'end');
+        case 1:
+          assert.strictEqual(event.type, 'value');
+          assert.strictEqual(event.value, 1);
+          break;
+        case 2:
+          assert.strictEqual(event.type, 'end');
 
-            s.onAny(function(event) {
-              switch (++calls2) {
-                case 1:
-                  assert.strictEqual(event.type, 'value');
-                  assert.strictEqual(event.value, 2);
-                  break;
-                case 2:
+          s.onAny(function(event) {
+            switch (++calls2) {
+            case 1:
+              assert.strictEqual(event.type, 'value');
+              assert.strictEqual(event.value, 2);
+              break;
+            case 2:
+              assert.strictEqual(event.type, 'end');
+
+              setTimeout(function() {
+                s.onAny(function(event) {
                   assert.strictEqual(event.type, 'end');
+                  done();
+                });
+              }, 0);
 
-                  setTimeout(function() {
-                    s.onAny(function(event) {
-                      assert.strictEqual(event.type, 'end');
-                      done();
-                    });
-                  }, 0);
-
-                  break;
-                default:
-                  throw new Error("Should not happen");
-              }
-            });
-            break;
-          default:
-            throw new Error("Should not happen");
+              break;
+            default:
+              throw new Error('Should not happen');
+            }
+          });
+          break;
+        default:
+          throw new Error('Should not happen');
         }
       });
       bus.emit(1);

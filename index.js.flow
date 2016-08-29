@@ -1,0 +1,7 @@
+/* @flow */
+
+import Kefir from 'kefir';
+
+declare function kefirCast(_Kefir: typeof Kefir, input: any): Kefir.Observable<any,any>;
+
+module.exports = kefirCast;
