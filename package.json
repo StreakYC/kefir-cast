@@ -1,6 +1,6 @@
 {
   "name": "kefir-cast",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "Convert various types of streams to Kefir streams.",
   "main": "index.js",
   "scripts": {
