@@ -34,8 +34,8 @@
     "baconjs": "^0.7.41",
     "kefir": "^3.0.0",
     "kefir-bus": "^2.0.0",
-    "lodash": "^3.3.1",
-    "mocha": "^2.1.0",
+    "lodash": "^4.15.0",
+    "mocha": "^3.0.2",
     "rx": "^4.0.8"
   },
   "peerDependencies": {

@@ -1,7 +1,7 @@
 'use strict';
 
-var constant = require('lodash/utility/constant');
-var noop = require('lodash/utility/noop');
+var constant = require('lodash/constant');
+var noop = require('lodash/noop');
 var assert = require('assert');
 var Bacon = require('baconjs');
 var Rx = require('rx');
