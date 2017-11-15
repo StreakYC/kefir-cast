@@ -1,7 +1,7 @@
 'use strict';
 
 function kefirCast(Kefir, input) {
-  if (input && input.subscribe && input.subscribeOnNext) { // RxJS
+  if (input && input.subscribe && input.subscribeOnNext) { // RxJS <= 4
     return Kefir.stream(function(emitter) {
       var subscription = input.subscribe(function onNext(value) {
         emitter.emit(value);
@@ -13,6 +13,20 @@ function kefirCast(Kefir, input) {
       });
       return function() {
         subscription.dispose();
+      };
+    });
+  } else if (input && input.subscribe && input.onErrorResumeNext) { // RxJS 5
+    return Kefir.stream(function(emitter) {
+      var subscription = input.subscribe(function onNext(value) {
+        emitter.emit(value);
+      }, function onError(err) {
+        emitter.error(err);
+        emitter.end();
+      }, function onCompleted() {
+        emitter.end();
+      });
+      return function() {
+        subscription.unsubscribe();
       };
     });
   } else if (input && input.onAny && input.offAny) { // Kefir

@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/StreakYC/kefir-cast",
   "devDependencies": {
+    "@reactivex/rxjs": "^5.5.2",
     "babel-eslint": "^8.0.2",
     "baconjs": "^0.7.41",
     "eslint": "^4.11.0",
