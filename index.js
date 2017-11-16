@@ -15,20 +15,6 @@ function kefirCast(Kefir, input) {
         subscription.dispose();
       };
     });
-  } else if (input && input.subscribe && input.pipe && input.lift) { // RxJS 5
-    return Kefir.stream(function(emitter) {
-      var subscription = input.subscribe(function onNext(value) {
-        emitter.emit(value);
-      }, function onError(err) {
-        emitter.error(err);
-        emitter.end();
-      }, function onCompleted() {
-        emitter.end();
-      });
-      return function() {
-        subscription.unsubscribe();
-      };
-    });
   } else if (input && input.onAny && input.offAny) { // Kefir
     return Kefir.stream(function(emitter) {
       function listener(event) {
@@ -66,6 +52,20 @@ function kefirCast(Kefir, input) {
           console.error('Unknown type of Bacon event', event);
         }
       });
+    });
+  } else if (input && input.subscribe && input.pipe && input.lift) { // RxJS 5
+    return Kefir.stream(function(emitter) {
+      var subscription = input.subscribe(function onNext(value) {
+        emitter.emit(value);
+      }, function onError(err) {
+        emitter.error(err);
+        emitter.end();
+      }, function onCompleted() {
+        emitter.end();
+      });
+      return function() {
+        subscription.unsubscribe();
+      };
     });
   } else {
     return Kefir.constant(input);
