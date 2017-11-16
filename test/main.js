@@ -5,7 +5,6 @@ const noop = require('lodash/noop');
 const assert = require('assert');
 const Bacon = require('baconjs');
 const Rx = require('rx');
-const Rx5 = require('@reactivex/rxjs');
 const Kefir = require('kefir');
 const kefirBus = require('kefir-bus');
 
@@ -330,10 +329,18 @@ describe('kefirCast', function() {
   });
 
   describe('RxJS 5', function() {
-    const Rx = Rx5;
+    // Shadow this name to let us know if we accidentally use Rx 4 in this test.
+    const Rx = null;
+
+    const {from} = require('@reactivex/rxjs/dist/package/observable/from');
+    const {map} = require('@reactivex/rxjs/dist/package/operators/map');
+    const {interval} = require('@reactivex/rxjs/dist/package/observable/interval');
+    const {concat} = require('@reactivex/rxjs/dist/package/observable/concat');
+    const {_throw} = require('@reactivex/rxjs/dist/package/observable/throw');
+    const {Subject} = require('@reactivex/rxjs/dist/package/Subject');
 
     it('supports basic observable', function(done) {
-      const s = kefirCast(Kefir, Rx.Observable.from([
+      const s = kefirCast(Kefir, from([
         'beep',
         shouldNotBeCalled
       ]));
@@ -361,11 +368,11 @@ describe('kefirCast', function() {
 
     it('handles unsubscription', function(done) {
       var calls = 0;
-      var s = kefirCast(Kefir, Rx.Observable.interval(0).map(function() {
+      var s = kefirCast(Kefir, map(interval(0), () => {
         if (++calls === 1) {
           return 'beep';
         } else {
-          process.nextTick(function() {
+          process.nextTick(() => {
             throw new Error('Unsubscription failed');
           });
         }
@@ -374,11 +381,11 @@ describe('kefirCast', function() {
     });
 
     it('supports observable with error', function(done) {
-      var err = new Error('some err');
-      var s = kefirCast(Kefir, Rx.Observable.from([
+      const err = new Error('some err');
+      const s = kefirCast(Kefir, concat(from([
         'beep',
         shouldNotBeCalled
-      ]).concat(Rx.Observable.throw(err)));
+      ]), _throw(err)));
 
       var calls = 0;
       s.onAny(function(event) {
@@ -406,7 +413,7 @@ describe('kefirCast', function() {
     });
 
     it('can listen on stream multiple times', function(done) {
-      var subject = new Rx.Subject();
+      var subject = new Subject();
 
       var s = kefirCast(Kefir, subject);
 
