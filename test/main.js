@@ -46,10 +46,11 @@ describe('kefirCast', function() {
     });
 
     it('supports all event types', function(done) {
+      this.slow(100);
       var s = kefirCast(Kefir, Bacon.mergeAll(
         Bacon.later(0, 'beep'),
-        Bacon.later(1, new Bacon.Error('bad')),
-        Bacon.later(2, shouldNotBeCalled)
+        Bacon.later(20, new Bacon.Error('bad')),
+        Bacon.later(40, shouldNotBeCalled)
       ).toProperty('prop'));
 
       var calls = 0;
@@ -330,7 +331,7 @@ describe('kefirCast', function() {
 
   describe('RxJS 5', function() {
     // Shadow this name to let us know if we accidentally use Rx 4 in this test.
-    const Rx = null;
+    const Rx = null; // eslint-disable-line no-unused-vars
 
     const {from} = require('@reactivex/rxjs/dist/package/observable/from');
     const {map} = require('@reactivex/rxjs/dist/package/operators/map');
@@ -477,10 +478,11 @@ describe('kefirCast', function() {
     });
 
     it('supports all event types', function(done) {
+      this.slow(100);
       var s = kefirCast(Kefir, Kefir.merge([
         Kefir.later(0, 'beep'),
-        Kefir.later(1, 'bad').flatMap(Kefir.constantError),
-        Kefir.later(2, shouldNotBeCalled)
+        Kefir.later(20, 'bad').flatMap(Kefir.constantError),
+        Kefir.later(40, shouldNotBeCalled)
       ]).toProperty(constant('prop')));
 
       var calls = 0;
