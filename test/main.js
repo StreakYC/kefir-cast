@@ -46,7 +46,7 @@ describe('kefirCast', function() {
     });
 
     it('supports all event types', function(done) {
-      this.slow(100);
+      this.slow(150);
       var s = kefirCast(Kefir, Bacon.mergeAll(
         Bacon.later(0, 'beep'),
         Bacon.later(20, new Bacon.Error('bad')),
@@ -478,7 +478,7 @@ describe('kefirCast', function() {
     });
 
     it('supports all event types', function(done) {
-      this.slow(100);
+      this.slow(150);
       var s = kefirCast(Kefir, Kefir.merge([
         Kefir.later(0, 'beep'),
         Kefir.later(20, 'bad').flatMap(Kefir.constantError),
