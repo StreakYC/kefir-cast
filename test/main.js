@@ -333,12 +333,12 @@ describe('kefirCast', function() {
     // Shadow this name to let us know if we accidentally use Rx 4 in this test.
     const Rx = null; // eslint-disable-line no-unused-vars
 
-    const {from} = require('@reactivex/rxjs/dist/package/observable/from');
-    const {map} = require('@reactivex/rxjs/dist/package/operators/map');
-    const {interval} = require('@reactivex/rxjs/dist/package/observable/interval');
-    const {concat} = require('@reactivex/rxjs/dist/package/observable/concat');
-    const {_throw} = require('@reactivex/rxjs/dist/package/observable/throw');
-    const {Subject} = require('@reactivex/rxjs/dist/package/Subject');
+    const {from} = require('@reactivex/rxjs/dist/cjs/observable/from');
+    const {map} = require('@reactivex/rxjs/dist/cjs/operator/map');
+    const {interval} = require('@reactivex/rxjs/dist/cjs/observable/interval');
+    const {concat} = require('@reactivex/rxjs/dist/cjs/observable/concat');
+    const {_throw} = require('@reactivex/rxjs/dist/cjs/observable/throw');
+    const {Subject} = require('@reactivex/rxjs/dist/cjs/Subject');
 
     it('supports basic observable', function(done) {
       const s = kefirCast(Kefir, from([
@@ -369,7 +369,7 @@ describe('kefirCast', function() {
 
     it('handles unsubscription', function(done) {
       var calls = 0;
-      var s = kefirCast(Kefir, map(interval(0), () => {
+      var s = kefirCast(Kefir, map.call(interval(0), () => {
         if (++calls === 1) {
           return 'beep';
         } else {
