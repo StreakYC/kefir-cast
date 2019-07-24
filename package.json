@@ -4,7 +4,7 @@
   "description": "Convert various types of streams to Kefir streams.",
   "main": "index.js",
   "scripts": {
-    "test": "yarn run lint && yarn flow check && mocha",
+    "test": "yarn run lint && yarn flow check && jest",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix"
   },
@@ -42,13 +42,16 @@
     "baconjs": "^0.7.41",
     "eslint": "^6.1.0",
     "flow-bin": "^0.103.0",
+    "jest": "^24.8.0",
     "kefir": "^3.0.0",
     "kefir-bus": "^2.0.0",
     "lodash": "^4.15.0",
-    "mocha": "^4.0.1",
     "rx": "^4.0.8"
   },
   "peerDependencies": {
     "kefir": "^3.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
