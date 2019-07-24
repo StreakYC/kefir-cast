@@ -39,7 +39,8 @@
   "devDependencies": {
     "@reactivex/rxjs": "~5.0.0",
     "babel-eslint": "^10.0.2",
-    "baconjs": "^0.7.41",
+    "baconjs": "^3.0.9",
+    "baconjs-v1": "npm:baconjs@^1.0.0",
     "eslint": "^6.1.0",
     "flow-bin": "^0.103.0",
     "husky": "^3.0.1",

@@ -638,10 +638,15 @@ babel-preset-jest@^24.6.0:
     "@babel/plugin-syntax-object-rest-spread" "^7.0.0"
     babel-plugin-jest-hoist "^24.6.0"
 
-baconjs@^0.7.41:
-  version "0.7.95"
-  resolved "https://registry.yarnpkg.com/baconjs/-/baconjs-0.7.95.tgz#96869a814c730e62e5991944eb2fcb8c97171615"
-  integrity sha512-3qp0GuAfEUlJybSVPQ2oai8VYO0aSTJf4wP/jYZpgaffEXi31VBcqSlVmD8ahmXXGzgdO+yFk9onDnt2ZJJXxA==
+"baconjs-v1@npm:baconjs@^1.0.0":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/baconjs/-/baconjs-1.0.1.tgz#3bb3cc14426840c06fb0b62dd410a5e25fe13d5d"
+  integrity sha512-f4YHGKrxagnsgzrd5E33VIcfTJaFBgBwvwINP0vi0mJW9Rddjda6sG/ICBeT5a5foZmqwWDhRbWpbSH+TLVKxw==
+
+baconjs@^3.0.9:
+  version "3.0.9"
+  resolved "https://registry.yarnpkg.com/baconjs/-/baconjs-3.0.9.tgz#3d06aee8c08c370825c8b2996433854d0a0c6422"
+  integrity sha512-jmVRdZhlnOXWoB/ad1lZVeLstSBxJ4/tQmZ7eqNNlSMvVKgysX0iQ8KJkN3MP0q0DWevqwujcvB9nmeLjN51pg==
 
 balanced-match@^1.0.0:
   version "1.0.0"

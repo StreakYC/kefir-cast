@@ -1,7 +1,6 @@
 const constant = require('lodash/constant');
 const noop = require('lodash/noop');
 const assert = require('assert');
-const Bacon = require('baconjs');
 const Rx = require('rx');
 const Kefir = require('kefir');
 const kefirBus = require('kefir-bus');
@@ -26,67 +25,122 @@ function shouldNotBeCalled() {
 }
 
 describe('Bacon', () => {
-  it('supports basic stream', done => {
-    testStreamForOneValue(
-      Bacon.later(0, shouldNotBeCalled),
-      shouldNotBeCalled,
-      done
-    );
-  });
+  const BaconVersions = [
+    ['v1', require('baconjs-v1')],
+    ['v3', require('baconjs')]
+  ];
+  for (const [name, Bacon] of BaconVersions) {
+    describe(name, () => {
+      it('supports basic stream', done => {
+        testStreamForOneValue(
+          Bacon.later(0, shouldNotBeCalled),
+          shouldNotBeCalled,
+          done
+        );
+      });
 
-  it('handles unsubscription', done => {
-    let calls = 0;
-    const s = kefirCast(
-      Kefir,
-      Bacon.fromPoll(0, () => {
-        if (++calls === 1) {
-          return 'beep';
-        } else {
-          throw new Error('Should not happen');
-        }
-      })
-    );
-    s.take(1).onEnd(done);
-  });
+      it('handles unsubscription', done => {
+        let calls = 0;
+        const s = kefirCast(
+          Kefir,
+          Bacon.fromPoll(0, () => {
+            if (++calls === 1) {
+              return 'beep';
+            } else {
+              throw new Error('Should not happen');
+            }
+          })
+        );
+        s.take(1).onEnd(done);
+      });
 
-  it('supports all event types', done => {
-    const s = kefirCast(
-      Kefir,
-      Bacon.mergeAll(
-        Bacon.later(0, 'beep'),
-        Bacon.later(20, new Bacon.Error('bad')),
-        Bacon.later(40, shouldNotBeCalled)
-      ).toProperty('prop')
-    );
+      it('supports all event types', done => {
+        const s = kefirCast(
+          Kefir,
+          Bacon.mergeAll(
+            Bacon.later(0, 'beep'),
+            Bacon.later(20, new Bacon.Error('bad')),
+            Bacon.later(40, shouldNotBeCalled)
+          ).toProperty('prop')
+        );
 
-    let calls = 0;
-    s.onAny(event => {
-      switch (++calls) {
-        case 1:
-          expect(event.type).toBe('value');
-          expect(event.value).toBe('prop');
-          break;
-        case 2:
-          expect(event.type).toBe('value');
-          expect(event.value).toBe('beep');
-          break;
-        case 3:
-          expect(event.type).toBe('error');
-          expect(event.value).toBe('bad');
-          break;
-        case 4:
-          expect(event.type).toBe('value');
-          expect(event.value).toBe(shouldNotBeCalled);
-          break;
-        case 5:
-          expect(event.type).toBe('end');
-          done();
-          break;
-        default:
-          throw new Error('Should not happen');
-      }
+        let calls = 0;
+        s.onAny(event => {
+          switch (++calls) {
+            case 1:
+              expect(event.type).toBe('value');
+              expect(event.value).toBe('prop');
+              break;
+            case 2:
+              expect(event.type).toBe('value');
+              expect(event.value).toBe('beep');
+              break;
+            case 3:
+              expect(event.type).toBe('error');
+              expect(event.value).toBe('bad');
+              break;
+            case 4:
+              expect(event.type).toBe('value');
+              expect(event.value).toBe(shouldNotBeCalled);
+              break;
+            case 5:
+              expect(event.type).toBe('end');
+              done();
+              break;
+            default:
+              throw new Error('Should not happen');
+          }
+        });
+      });
+
+      it('can listen on stream multiple times', done => {
+        const bus = new Bacon.Bus();
+
+        const s = kefirCast(Kefir, bus);
+
+        let calls1 = 0,
+          calls2 = 0;
+        s.take(1).onAny(event => {
+          switch (++calls1) {
+            case 1:
+              expect(event.type).toBe('value');
+              expect(event.value).toBe(1);
+              break;
+            case 2:
+              expect(event.type).toBe('end');
+
+              s.onAny(event => {
+                switch (++calls2) {
+                  case 1:
+                    expect(event.type).toBe('value');
+                    expect(event.value).toBe(2);
+                    break;
+                  case 2:
+                    expect(event.type).toBe('end');
+
+                    setTimeout(() => {
+                      s.onAny(event => {
+                        expect(event.type).toBe('end');
+                        done();
+                      });
+                    }, 0);
+
+                    break;
+                  default:
+                    throw new Error('Should not happen');
+                }
+              });
+              break;
+            default:
+              throw new Error('Should not happen');
+          }
+        });
+        bus.push(1);
+        bus.push(2);
+        bus.end();
+      });
     });
-  });
+  }
 
   it('works on mock stream object', done => {
     let unsubbed = 0;
@@ -94,54 +148,54 @@ describe('Bacon', () => {
       onValue: true,
       subscribe: sink => {
         sink({
-          isInitial: constant(true),
-          isNext: constant(false),
-          isError: constant(false),
-          isEnd: constant(false),
-          value: constant('prop'),
-          hasValue: constant(true)
+          isInitial: true,
+          isNext: false,
+          isError: false,
+          isEnd: false,
+          value: 'prop',
+          hasValue: true
         });
         setTimeout(() => {
           sink({
-            isInitial: constant(false),
-            isNext: constant(true),
-            isError: constant(false),
-            isEnd: constant(false),
-            value: constant('beep'),
-            hasValue: constant(true)
+            isInitial: false,
+            isNext: true,
+            isError: false,
+            isEnd: false,
+            value: 'beep',
+            hasValue: true
           });
           sink({
-            isInitial: constant(false),
-            isNext: constant(false),
-            isError: constant(true),
-            isEnd: constant(false),
+            isInitial: false,
+            isNext: false,
+            isError: true,
+            isEnd: false,
             error: 'bad',
-            hasValue: constant(false)
+            hasValue: false
           });
           sink({
-            isInitial: constant(false),
-            isNext: constant(true),
-            isError: constant(false),
-            isEnd: constant(false),
-            value: constant(shouldNotBeCalled),
-            hasValue: constant(true)
+            isInitial: false,
+            isNext: true,
+            isError: false,
+            isEnd: false,
+            value: shouldNotBeCalled,
+            hasValue: true
           });
           sink({
-            isInitial: constant(false),
-            isNext: constant(false),
-            isError: constant(false),
-            isEnd: constant(true),
-            hasValue: constant(false)
+            isInitial: false,
+            isNext: false,
+            isError: false,
+            isEnd: true,
+            hasValue: false
           });
           sink({
-            isInitial: constant(false),
-            isNext: constant(true),
-            isError: constant(false),
-            isEnd: constant(false),
+            isInitial: false,
+            isNext: true,
+            isError: false,
+            isEnd: false,
             value: () => {
               throw new Error('Post-end event should not be evaluated');
             },
-            hasValue: constant(true)
+            hasValue: true
           });
         }, 0);
 
@@ -182,53 +236,6 @@ describe('Bacon', () => {
           throw new Error('Should not happen');
       }
     });
-  });
-
-  it('can listen on stream multiple times', done => {
-    const bus = new Bacon.Bus();
-
-    const s = kefirCast(Kefir, bus);
-
-    let calls1 = 0,
-      calls2 = 0;
-    s.take(1).onAny(event => {
-      switch (++calls1) {
-        case 1:
-          expect(event.type).toBe('value');
-          expect(event.value).toBe(1);
-          break;
-        case 2:
-          expect(event.type).toBe('end');
-
-          s.onAny(event => {
-            switch (++calls2) {
-              case 1:
-                expect(event.type).toBe('value');
-                expect(event.value).toBe(2);
-                break;
-              case 2:
-                expect(event.type).toBe('end');
-
-                setTimeout(() => {
-                  s.onAny(event => {
-                    expect(event.type).toBe('end');
-                    done();
-                  });
-                }, 0);
-
-                break;
-              default:
-                throw new Error('Should not happen');
-            }
-          });
-          break;
-        default:
-          throw new Error('Should not happen');
-      }
-    });
-    bus.push(1);
-    bus.push(2);
-    bus.end();
   });
 });
 
