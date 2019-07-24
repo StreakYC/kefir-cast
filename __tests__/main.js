@@ -239,7 +239,7 @@ describe('Bacon', () => {
   });
 });
 
-describe('RxJS', () => {
+describe('RxJS 4', () => {
   it('supports basic observable', done => {
     const s = kefirCast(Kefir, Rx.Observable.from(['beep', shouldNotBeCalled]));
 
@@ -363,17 +363,13 @@ describe('RxJS', () => {
   });
 });
 
-describe('RxJS 5', () => {
+describe('RxJS 6', () => {
   // Shadow this name to let us know if we accidentally use Rx 4 in this test.
   // eslint-disable-next-line no-unused-vars
   const Rx = null;
 
-  const { from } = require('@reactivex/rxjs/dist/cjs/observable/from');
-  const { map } = require('@reactivex/rxjs/dist/cjs/operator/map');
-  const { interval } = require('@reactivex/rxjs/dist/cjs/observable/interval');
-  const { concat } = require('@reactivex/rxjs/dist/cjs/observable/concat');
-  const { _throw } = require('@reactivex/rxjs/dist/cjs/observable/throw');
-  const { Subject } = require('@reactivex/rxjs/dist/cjs/Subject');
+  const { from, interval, concat, throwError, Subject } = require('rxjs');
+  const { map } = require('rxjs/operators');
 
   it('supports basic observable', done => {
     const s = kefirCast(Kefir, from(['beep', shouldNotBeCalled]));
@@ -420,7 +416,7 @@ describe('RxJS 5', () => {
     const err = new Error('some err');
     const s = kefirCast(
       Kefir,
-      concat(from(['beep', shouldNotBeCalled]), _throw(err))
+      concat(from(['beep', shouldNotBeCalled]), throwError(err))
     );
 
     let calls = 0;
