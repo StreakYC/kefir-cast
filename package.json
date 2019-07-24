@@ -38,9 +38,9 @@
   "homepage": "https://github.com/StreakYC/kefir-cast",
   "devDependencies": {
     "@reactivex/rxjs": "~5.0.0",
-    "babel-eslint": "^8.0.2",
+    "babel-eslint": "^10.0.2",
     "baconjs": "^0.7.41",
-    "eslint": "^4.11.0",
+    "eslint": "^6.1.0",
     "flow-bin": "^0.103.0",
     "kefir": "^3.0.0",
     "kefir-bus": "^2.0.0",
