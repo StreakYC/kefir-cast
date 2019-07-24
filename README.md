@@ -8,13 +8,13 @@ by libraries which use Kefir internally, but want to be able to accept streams
 from other libraries or other versions of Kefir as arguments given by the
 application.
 
-* Supports converting RxJS (v2-v5) Observables into Kefir streams.
-* Supports converting Bacon.js streams into Kefir streams.
-* Supports converting a Kefir stream created by one instance of the Kefir
+- Supports converting RxJS (v2-v5) Observables into Kefir streams.
+- Supports converting Bacon.js streams into Kefir streams.
+- Supports converting a Kefir stream created by one instance of the Kefir
   library into a stream usable by a different instance of a Kefir library.
   (This smooths over possible issues if the application uses a different
   version of Kefir.)
-* Casts non-streams into a Kefir stream of one item by using Kefir.constant().
+- Casts non-streams into a Kefir stream of one item by using Kefir.constant().
 
 KefirCast is intended for use in nodejs and in browsers via CommonJS bundlers
 like Browserify. This project is in NPM and can be installed with

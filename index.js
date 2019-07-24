@@ -1,36 +1,42 @@
 'use strict';
 
 function kefirCast(Kefir, input) {
-  if (input && input.subscribe && input.subscribeOnNext) { // RxJS <= 4
+  if (input && input.subscribe && input.subscribeOnNext) {
+    // RxJS <= 4
     return Kefir.stream(function(emitter) {
-      var subscription = input.subscribe(function onNext(value) {
-        emitter.emit(value);
-      }, function onError(err) {
-        emitter.error(err);
-        emitter.end();
-      }, function onCompleted() {
-        emitter.end();
-      });
+      var subscription = input.subscribe(
+        function onNext(value) {
+          emitter.emit(value);
+        },
+        function onError(err) {
+          emitter.error(err);
+          emitter.end();
+        },
+        function onCompleted() {
+          emitter.end();
+        }
+      );
       return function() {
         subscription.dispose();
       };
     });
-  } else if (input && input.onAny && input.offAny) { // Kefir
+  } else if (input && input.onAny && input.offAny) {
+    // Kefir
     return Kefir.stream(function(emitter) {
       function listener(event) {
         switch (event.type) {
-        case 'value':
-          emitter.emit(event.value);
-          break;
-        case 'error':
-          emitter.error(event.value);
-          break;
-        case 'end':
-          emitter.end();
-          break;
-        default:
-          // eslint-disable-next-line no-console
-          console.error('Unknown type of Kefir event', event);
+          case 'value':
+            emitter.emit(event.value);
+            break;
+          case 'error':
+            emitter.error(event.value);
+            break;
+          case 'end':
+            emitter.end();
+            break;
+          default:
+            // eslint-disable-next-line no-console
+            console.error('Unknown type of Kefir event', event);
         }
       }
       input.onAny(listener);
@@ -38,7 +44,8 @@ function kefirCast(Kefir, input) {
         input.offAny(listener);
       };
     });
-  } else if (input && input.subscribe && input.onValue) { // Bacon
+  } else if (input && input.subscribe && input.onValue) {
+    // Bacon
     return Kefir.stream(function(emitter) {
       return input.subscribe(function(event) {
         if (event.hasValue()) {
@@ -53,16 +60,21 @@ function kefirCast(Kefir, input) {
         }
       });
     });
-  } else if (input && input.subscribe && input.lift) { // RxJS 5
+  } else if (input && input.subscribe && input.lift) {
+    // RxJS 5
     return Kefir.stream(function(emitter) {
-      var subscription = input.subscribe(function onNext(value) {
-        emitter.emit(value);
-      }, function onError(err) {
-        emitter.error(err);
-        emitter.end();
-      }, function onCompleted() {
-        emitter.end();
-      });
+      var subscription = input.subscribe(
+        function onNext(value) {
+          emitter.emit(value);
+        },
+        function onError(err) {
+          emitter.error(err);
+          emitter.end();
+        },
+        function onCompleted() {
+          emitter.end();
+        }
+      );
       return function() {
         subscription.unsubscribe();
       };
