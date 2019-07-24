@@ -4,8 +4,7 @@
   "description": "Convert various types of streams to Kefir streams.",
   "main": "index.js",
   "scripts": {
-    "test": "npm run lint && npm run flow_check && mocha",
-    "flow_check": "flow check",
+    "test": "yarn run lint && yarn flow check && mocha",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix"
   },
@@ -38,7 +37,7 @@
     "babel-eslint": "^8.0.2",
     "baconjs": "^0.7.41",
     "eslint": "^4.11.0",
-    "flow-bin": "^0.59.0",
+    "flow-bin": "^0.103.0",
     "kefir": "^3.0.0",
     "kefir-bus": "^2.0.0",
     "lodash": "^4.15.0",
