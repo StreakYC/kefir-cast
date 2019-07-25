@@ -8,8 +8,8 @@ by libraries which use Kefir internally, but want to be able to accept streams
 from other libraries or other versions of Kefir as arguments given by the
 application.
 
-- Supports converting RxJS (v2-v5) Observables into Kefir streams.
-- Supports converting Bacon.js streams into Kefir streams.
+- Supports converting RxJS (v2-v6) Observables into Kefir streams.
+- Supports converting Bacon.js (v0.7-v3) streams into Kefir streams.
 - Supports converting a Kefir stream created by one instance of the Kefir
   library into a stream usable by a different instance of a Kefir library.
   (This smooths over possible issues if the application uses a different
