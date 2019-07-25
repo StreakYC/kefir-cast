@@ -61,7 +61,7 @@ function kefirCast(Kefir, input) {
       });
     });
   } else if (input && input.subscribe && input.lift) {
-    // RxJS 5
+    // RxJS 5+
     return Kefir.stream(function(emitter) {
       var subscription = input.subscribe(
         function onNext(value) {
