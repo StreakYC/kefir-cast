@@ -4,7 +4,7 @@
   "description": "Convert various types of streams to Kefir streams.",
   "main": "index.js",
   "scripts": {
-    "test": "yarn run lint && yarn flow check && jest",
+    "test": "yarn run lint && flow check && tsc && jest",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix"
   },
@@ -14,7 +14,8 @@
   },
   "files": [
     "index.js",
-    "index.js.flow"
+    "index.js.flow",
+    "index.d.ts"
   ],
   "keywords": [
     "kefir",
@@ -37,6 +38,7 @@
   },
   "homepage": "https://github.com/StreakYC/kefir-cast",
   "devDependencies": {
+    "@types/kefir": "^3.8.2",
     "babel-eslint": "^10.0.2",
     "baconjs": "^3.0.9",
     "baconjs-v1": "npm:baconjs@^1.0.0",
@@ -50,7 +52,8 @@
     "lodash": "^4.15.0",
     "prettier": "^1.18.2",
     "rx": "^4.0.8",
-    "rxjs": "^6.5.2"
+    "rxjs": "^6.5.2",
+    "typescript": "^3.5.3"
   },
   "peerDependencies": {
     "kefir": "^3.0.0"
