@@ -23,25 +23,10 @@ function kefirCast(Kefir, input) {
   } else if (input && input.onAny && input.offAny) {
     // Kefir
     return Kefir.stream(function(emitter) {
-      function listener(event) {
-        switch (event.type) {
-          case 'value':
-            emitter.emit(event.value);
-            break;
-          case 'error':
-            emitter.error(event.value);
-            break;
-          case 'end':
-            emitter.end();
-            break;
-          default:
-            // eslint-disable-next-line no-console
-            console.error('Unknown type of Kefir event', event);
-        }
-      }
-      input.onAny(listener);
+      var emitEvent = emitter.emitEvent;
+      input.onAny(emitEvent);
       return function() {
-        input.offAny(listener);
+        input.offAny(emitEvent);
       };
     });
   } else if (input && input.subscribe && input.onValue) {
