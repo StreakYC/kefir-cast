@@ -1,3 +1,8 @@
+## 3.3.0 (2019-07-24)
+
+- Added TypeScript type definitions.
+- Added support for Bacon.js versions 2 and 3.
+
 ## 3.2.2 (2017-11-16)
 
 - Fixed compatibility with RxJS versions 5.0 through 5.5.
